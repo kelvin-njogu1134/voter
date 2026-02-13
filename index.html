@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System | Cast Your Vote</title>
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Card Layout for All Pages */
+        .page {
+            display: none;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Styling */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        /* Form Elements Styling */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            text-align: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .btn-results {
+            background-color: #9b59b6;
+        }
+
+        .btn-results:hover {
+            background-color: #8e44ad;
+        }
+
+        /* Role Selection Styling */
+        .role-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 25px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-option:hover {
+            border-color: #3498db;
+            background-color: #f8fafc;
+        }
+
+        .role-option.selected {
+            border-color: #3498db;
+            background-color: #ebf5fb;
+        }
+
+        .role-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        /* Voting Position Cards */
+        .position-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .position-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .candidate-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+
+        .candidate-option:hover {
+            background-color: #f0f7ff;
+            border-color: #3498db;
+        }
+
+        .candidate-option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        /* Confirmation Page Styling */
+        .vote-summary {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .position-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .candidate-name {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        /* Thank You Page Styling */
+        .thank-you-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .thank-you-icon {
+            font-size: 80px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .thank-you-container h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .thank-you-container p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+
+        /* Results Page Styling */
+        .results-container {
+            margin-top: 30px;
+        }
+
+        .results-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .results-position {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .candidate-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .candidate-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .candidate-party {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .vote-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .vote-bar-container {
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .vote-bar {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-indicator:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background-color: #e0e0e0;
+            color: #7f8c8d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 600;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .progress-step.active .step-number {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .progress-step.completed .step-number {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .button-group .btn {
+            margin-top: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .page {
+                padding: 25px 20px;
+            }
+            
+            .role-options {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Sign In</div>
+            </div>
+            <div class="progress-step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Role</div>
+            </div>
+            <div class="progress-step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">Ward</div>
+            </div>
+            <div class="progress-step" id="step4">
+                <div class="step-number">4</div>
+                <div class="step-label">Vote</div>
+            </div>
+            <div class="progress-step" id="step5">
+                <div class="step-number">5</div>
+                <div class="step-label">Confirm</div>
+            </div>
+            <div class="progress-step" id="step6">
+                <div class="step-number">6</div>
+                <div class="step-label">Finish</div>
+            </div>
+        </div>
+
+        <!-- Sign In Page -->
+        <div class="page active" id="signin-page">
+            <div class="header">
+                <h1>Welcome to Voting System</h1>
+                <p>Please sign in with your name and ID number to continue</p>
+            </div>
+            
+            <form id="signin-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id-number">ID Number</label>
+                    <input type="text" id="id-number" class="form-control" placeholder="Enter your ID number" required>
+                </div>
+                
+                <button type="submit" class="btn">Sign In</button>
+            </form>
+            
+            <div class="footer">
+                <p>This is a demonstration voting system. Data is stored locally in your browser.</p>
+                <button class="btn btn-results" id="view-results-from-signin">View Current Results</button>
+            </div>
+        </div>
+
+        <!-- Role Selection Page -->
+        <div class="page" id="role-page">
+            <div class="header">
+                <h1>Select Your Role</h1>
+                <p>Are you voting or running as a candidate?</p>
+            </div>
+            
+            <div class="role-options">
+                <div class="role-option" id="voter-option">
+                    <div class="role-icon">🗳️</div>
+                    <h3>Voter</h3>
+                    <p>I want to cast my vote in the election</p>
+                </div>
+                
+                <div class="role-option" id="candidate-option">
+                    <div class="role-icon">👔</div>
+                    <h3>Candidate</h3>
+                    <p>I am running for a position in the election</p>
+                </div>
+            </div>
+            
+            <input type="hidden" id="selected-role">
+            
+            <div class="button-group">
+                <button class="btn" id="role-continue">Continue</button>
+                <button class="btn btn-secondary" id="back-to-signin">Back</button>
+            </div>
+        </div>
+
+        <!-- Ward Selection Page -->
+        <div class="page" id="ward-page">
+            <div class="header">
+                <h1>Select Your Ward</h1>
+                <p>Please select the ward where you are registered to vote</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="ward-select">Ward</label>
+                <select id="ward-select" class="form-control">
+                    <option value="">-- Select a ward --</option>
+                    <option value="central">Central Ward</option>
+                    <option value="north">North Ward</option>
+                    <option value="south">South Ward</option>
+                    <option value="east">East Ward</option>
+                    <option value="west">West Ward</option>
+                    <option value="lakeview">Lakeview Ward</option>
+                    <option value="hilltop">Hilltop Ward</option>
+                    <option value="riverside">Riverside Ward</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" id="ward-continue">Continue</button>
+                <button class="btn btn-secondary" id="back-to-role">Back</button>
+            </div>
+        </div>
+
+        <!-- Voting Page -->
+        <div class="page" id="voting-page">
+            <div class="header">
+                <h1>Cast Your Vote</h1>
+                <p>Select your preferred candidate for each position</p>
+            </div>
+            
+            <form id="voting-form">
+                <!-- President Position -->
+                <div class="position-card">
+                    <div class="position-title">President</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="president-1" name="president" value="John Kamau" data-party="Progressive Party">
+                        <label for="president-1">John Kamau (Progressive Party)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="president-2" name="president" value="Sarah Achieng" data-party="Unity Alliance">
+                        <label for="president-2">Sarah Achieng (Unity Alliance)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="president-3" name="president" value="David Omondi" data-party="Green Future Party">
+                        <label for="president-3">David Omondi (Green Future Party)</label>
+                    </div>
+                </div>
+                
+                <!-- Governor Position -->
+                <div class="position-card">
+                    <div class="position-title">Governor</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="governor-1" name="governor" value="Michael Kiptoo" data-party="Development Coalition">
+                        <label for="governor-1">Michael Kiptoo (Development Coalition)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="governor-2" name="governor" value="Grace Wanjiru" data-party="People's Movement">
+                        <label for="governor-2">Grace Wanjiru (People's Movement)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="governor-3" name="governor" value="Robert Mutua" data-party="Service First Party">
+                        <label for="governor-3">Robert Mutua (Service First Party)</label>
+                    </div>
+                </div>
+                
+                <!-- Senator Position -->
+                <div class="position-card">
+                    <div class="position-title">Senator</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="senator-1" name="senator" value="Elizabeth Njoroge" data-party="Progressive Party">
+                        <label for="senator-1">Elizabeth Njoroge (Progressive Party)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="senator-2" name="senator" value="Peter Odhiambo" data-party="Unity Alliance">
+                        <label for="senator-2">Peter Odhiambo (Unity Alliance)</label>
+                    </div>
+                </div>
+                
+                <!-- MP Position -->
+                <div class="position-card">
+                    <div class="position-title">Member of Parliament (MP)</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mp-1" name="mp" value="James Mwangi" data-party="Development Coalition">
+                        <label for="mp-1">James Mwangi (Development Coalition)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mp-2" name="mp" value="Catherine Atieno" data-party="People's Movement">
+                        <label for="mp-2">Catherine Atieno (People's Movement)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mp-3" name="mp" value="Samuel Otieno" data-party="Service First Party">
+                        <label for="mp-3">Samuel Otieno (Service First Party)</label>
+                    </div>
+                </div>
+                
+                <!-- Woman Representative Position -->
+                <div class="position-card">
+                    <div class="position-title">Woman Representative</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="woman-rep-1" name="woman-rep" value="Fatuma Hassan" data-party="Progressive Party">
+                        <label for="woman-rep-1">Fatuma Hassan (Progressive Party)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="woman-rep-2" name="woman-rep" value="Ruth Adhiambo" data-party="Unity Alliance">
+                        <label for="woman-rep-2">Ruth Adhiambo (Unity Alliance)</label>
+                    </div>
+                </div>
+                
+                <!-- MCA Position -->
+                <div class="position-card">
+                    <div class="position-title">Member of County Assembly (MCA)</div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mca-1" name="mca" value="Josephine Wambui" data-party="Development Coalition">
+                        <label for="mca-1">Josephine Wambui (Development Coalition)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mca-2" name="mca" value="Daniel Kariuki" data-party="People's Movement">
+                        <label for="mca-2">Daniel Kariuki (People's Movement)</label>
+                    </div>
+                    
+                    <div class="candidate-option">
+                        <input type="radio" id="mca-3" name="mca" value="Lucy Chebet" data-party="Service First Party">
+                        <label for="mca-3">Lucy Chebet (Service First Party)</label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn" id="submit-vote">Submit Vote</button>
+                    <button class="btn btn-secondary" id="back-to-ward">Back</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Confirmation Page -->
+        <div class="page" id="confirmation-page">
+            <div class="header">
+                <h1>Confirm Your Vote</h1>
+                <p>Please review your selections before submitting</p>
+            </div>
+            
+            <div class="vote-summary">
+                <h3>You have voted for:</h3>
+                
+                <div class="summary-item">
+                    <span class="position-name">President:</span>
+                    <span class="candidate-name" id="confirm-president">Not selected</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="position-name">Governor:</span>
+                    <span class="candidate-name" id="confirm-governor">Not selected</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="position-name">Senator:</span>
+                    <span class="candidate-name" id="confirm-senator">Not selected</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="position-name">Member of Parliament:</span>
+                    <span class="candidate-name" id="confirm-mp">Not selected</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="position-name">Woman Representative:</span>
+                    <span class="candidate-name" id="confirm-woman-rep">Not selected</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="position-name">Member of County Assembly:</span>
+                    <span class="candidate-name" id="confirm-mca">Not selected</span>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-success" id="confirm-vote">Confirm & Submit Vote</button>
+                <button class="btn btn-secondary" id="back-to-voting">Back to Voting</button>
+            </div>
+        </div>
+
+        <!-- Thank You Page -->
+        <div class="page" id="thankyou-page">
+            <div class="thank-you-container">
+                <div class="thank-you-icon">✓</div>
+                <h2>Thank You for Voting!</h2>
+                <p>Your vote has been recorded successfully. Your participation helps strengthen our democracy.</p>
+                <p>You can now view the current results or start a new voting session.</p>
+                
+                <div class="button-group">
+                    <button class="btn btn-results" id="view-results">View Current Results</button>
+                    <button class="btn" id="start-new-session">Start New Session</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div class="page" id="results-page">
+            <div class="header">
+                <h1>Election Results</h1>
+                <p>Current vote counts for all positions</p>
+                <p><small>Results are stored locally in your browser</small></p>
+            </div>
+            
+            <div class="results-container" id="results-container">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" id="back-from-results">Back to Voting</button>
+                <button class="btn btn-secondary" id="reset-results">Reset All Votes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Voting System with Vote Counting
+        
+        // Define all candidates with their positions and parties
+        const candidates = {
+            president: [
+                { name: "John Kamau", party: "Progressive Party" },
+                { name: "Sarah Achieng", party: "Unity Alliance" },
+                { name: "David Omondi", party: "Green Future Party" }
+            ],
+            governor: [
+                { name: "Michael Kiptoo", party: "Development Coalition" },
+                { name: "Grace Wanjiru", party: "People's Movement" },
+                { name: "Robert Mutua", party: "Service First Party" }
+            ],
+            senator: [
+                { name: "Elizabeth Njoroge", party: "Progressive Party" },
+                { name: "Peter Odhiambo", party: "Unity Alliance" }
+            ],
+            mp: [
+                { name: "James Mwangi", party: "Development Coalition" },
+                { name: "Catherine Atieno", party: "People's Movement" },
+                { name: "Samuel Otieno", party: "Service First Party" }
+            ],
+            "woman-rep": [
+                { name: "Fatuma Hassan", party: "Progressive Party" },
+                { name: "Ruth Adhiambo", party: "Unity Alliance" }
+            ],
+            mca: [
+                { name: "Josephine Wambui", party: "Development Coalition" },
+                { name: "Daniel Kariuki", party: "People's Movement" },
+                { name: "Lucy Chebet", party: "Service First Party" }
+            ]
+        };
+
+        // Position display names
+        const positionNames = {
+            president: "President",
+            governor: "Governor",
+            senator: "Senator",
+            mp: "Member of Parliament",
+            "woman-rep": "Woman Representative",
+            mca: "Member of County Assembly (MCA)"
+        };
+
+        // Store user data in an object
+        const userData = {
+            name: '',
+            idNumber: '',
+            role: '',
+            ward: '',
+            votes: {}
+        };
+
+        // Get all page elements
+        const pages = {
+            signin: document.getElementById('signin-page'),
+            role: document.getElementById('role-page'),
+            ward: document.getElementById('ward-page'),
+            voting: document.getElementById('voting-page'),
+            confirmation: document.getElementById('confirmation-page'),
+            thankyou: document.getElementById('thankyou-page'),
+            results: document.getElementById('results-page')
+        };
+
+        // Get all step indicators
+        const steps = {
+            step1: document.getElementById('step1'),
+            step2: document.getElementById('step2'),
+            step3: document.getElementById('step3'),
+            step4: document.getElementById('step4'),
+            step5: document.getElementById('step5'),
+            step6: document.getElementById('step6')
+        };
+
+        // Function to initialize vote counts in localStorage if they don't exist
+        function initializeVoteCounts() {
+            if (!localStorage.getItem('voteCounts')) {
+                const initialCounts = {};
+                
+                // Initialize counts for all candidates
+                for (const position in candidates) {
+                    initialCounts[position] = {};
+                    candidates[position].forEach(candidate => {
+                        initialCounts[position][candidate.name] = 0;
+                    });
+                }
+                
+                localStorage.setItem('voteCounts', JSON.stringify(initialCounts));
+            }
+        }
+
+        // Function to get vote counts from localStorage
+        function getVoteCounts() {
+            return JSON.parse(localStorage.getItem('voteCounts'));
+        }
+
+        // Function to update vote counts in localStorage
+        function updateVoteCounts(votes) {
+            const voteCounts = getVoteCounts();
+            
+            // Increment vote count for each selected candidate
+            for (const position in votes) {
+                const candidateName = votes[position];
+                if (candidateName && candidateName !== 'Not selected') {
+                    if (voteCounts[position] && voteCounts[position][candidateName] !== undefined) {
+                        voteCounts[position][candidateName]++;
+                    }
+                }
+            }
+            
+            localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+        }
+
+        // Function to reset all vote counts
+        function resetAllVotes() {
+            if (confirm("Are you sure you want to reset all votes? This cannot be undone.")) {
+                localStorage.removeItem('voteCounts');
+                localStorage.removeItem('demoVotes');
+                initializeVoteCounts();
+                displayResults();
+                alert("All votes have been reset.");
+            }
+        }
+
+        // Function to show a specific page and hide others
+        function showPage(pageId) {
+            // Hide all pages
+            Object.values(pages).forEach(page => page.classList.remove('active'));
+            
+            // Show the requested page
+            if (pages[pageId]) {
+                pages[pageId].classList.add('active');
+            }
+            
+            // Update progress indicator
+            updateProgressIndicator(pageId);
+            
+            // If showing results page, update the results
+            if (pageId === 'results') {
+                displayResults();
+            }
+        }
+
+        // Function to update the progress indicator
+        function updateProgressIndicator(currentPage) {
+            // Reset all steps
+            Object.values(steps).forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            
+            // Map pages to steps
+            const pageToStepMap = {
+                'signin': 'step1',
+                'role': 'step2',
+                'ward': 'step3',
+                'voting': 'step4',
+                'confirmation': 'step5',
+                'thankyou': 'step6'
+            };
+            
+            // Mark previous steps as completed and current as active
+            const stepKeys = Object.keys(pageToStepMap);
+            const currentIndex = stepKeys.indexOf(currentPage);
+            
+            for (let i = 0; i <= currentIndex; i++) {
+                const step = steps[pageToStepMap[stepKeys[i]]];
+                if (i < currentIndex) {
+                    step.classList.add('completed');
+                } else {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        // Function to collect votes from the voting form
+        function collectVotes() {
+            userData.votes = {};
+            
+            // Get selected candidate for each position
+            const positions = ['president', 'governor', 'senator', 'mp', 'woman-rep', 'mca'];
+            
+            positions.forEach(position => {
+                const selectedOption = document.querySelector(`input[name="${position}"]:checked`);
+                userData.votes[position] = selectedOption ? selectedOption.value : 'Not selected';
+            });
+            
+            return userData.votes;
+        }
+
+        // Function to update confirmation page with votes
+        function updateConfirmationPage() {
+            document.getElementById('confirm-president').textContent = userData.votes.president || 'Not selected';
+            document.getElementById('confirm-governor').textContent = userData.votes.governor || 'Not selected';
+            document.getElementById('confirm-senator').textContent = userData.votes.senator || 'Not selected';
+            document.getElementById('confirm-mp').textContent = userData.votes.mp || 'Not selected';
+            document.getElementById('confirm-woman-rep').textContent = userData.votes['woman-rep'] || 'Not selected';
+            document.getElementById('confirm-mca').textContent = userData.votes.mca || 'Not selected';
+        }
+
+        // Function to display results on the results page
+        function displayResults() {
+            const resultsContainer = document.getElementById('results-container');
+            const voteCounts = getVoteCounts();
+            
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            
+            // Calculate total votes for each position
+            const positionTotals = {};
+            for (const position in voteCounts) {
+                positionTotals[position] = 0;
+                for (const candidate in voteCounts[position]) {
+                    positionTotals[position] += voteCounts[position][candidate];
+                }
+            }
+            
+            // Create results for each position
+            for (const position in candidates) {
+                const resultsCard = document.createElement('div');
+                resultsCard.className = 'results-card';
+                
+                const positionTitle = document.createElement('h3');
+                positionTitle.className = 'results-position';
+                positionTitle.textContent = positionNames[position];
+                
+                // Add total votes for this position
+                const totalVotes = document.createElement('p');
+                totalVotes.innerHTML = `<strong>Total Votes Cast: ${positionTotals[position]}</strong>`;
+                
+                resultsCard.appendChild(positionTitle);
+                resultsCard.appendChild(totalVotes);
+                
+                // Create a result for each candidate in this position
+                candidates[position].forEach(candidate => {
+                    const voteCount = voteCounts[position][candidate.name] || 0;
+                    const percentage = positionTotals[position] > 0 ? 
+                        Math.round((voteCount / positionTotals[position]) * 100) : 0;
+                    
+                    const candidateResult = document.createElement('div');
+                    candidateResult.className = 'candidate-result';
+                    
+                    const candidateInfo = document.createElement('div');
+                    candidateInfo.className = 'candidate-info';
+                    
+                    const candidateName = document.createElement('div');
+                    candidateName.className = 'candidate-name';
+                    candidateName.textContent = candidate.name;
+                    
+                    const candidateParty = document.createElement('div');
+                    candidateParty.className = 'candidate-party';
+                    candidateParty.textContent = candidate.party;
+                    
+                    candidateInfo.appendChild(candidateName);
+                    candidateInfo.appendChild(candidateParty);
+                    
+                    const voteDisplay = document.createElement('div');
+                    voteDisplay.className = 'vote-count';
+                    voteDisplay.textContent = `${voteCount} votes`;
+                    
+                    candidateResult.appendChild(candidateInfo);
+                    candidateResult.appendChild(voteDisplay);
+                    
+                    // Add vote percentage bar
+                    const voteBarContainer = document.createElement('div');
+                    voteBarContainer.className = 'vote-bar-container';
+                    
+                    const voteBar = document.createElement('div');
+                    voteBar.className = 'vote-bar';
+                    voteBar.style.width = `${percentage}%`;
+                    voteBar.setAttribute('data-percentage', percentage);
+                    
+                    voteBarContainer.appendChild(voteBar);
+                    
+                    // Add percentage text
+                    const percentageText = document.createElement('div');
+                    percentageText.style.marginTop = '5px';
+                    percentageText.textContent = `${percentage}%`;
+                    
+                    candidateResult.appendChild(voteBarContainer);
+                    candidateResult.appendChild(percentageText);
+                    
+                    resultsCard.appendChild(candidateResult);
+                });
+                
+                resultsContainer.appendChild(resultsCard);
+            }
+        }
+
+        // Event Listeners for Sign In Page
+        document.getElementById('signin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            userData.name = document.getElementById('name').value.trim();
+            userData.idNumber = document.getElementById('id-number').value.trim();
+            
+            // Basic validation
+            if (!userData.name || !userData.idNumber) {
+                alert('Please enter both your name and ID number');
+                return;
+            }
+            
+            // Check if this ID has already voted
+            const existingVotes = JSON.parse(localStorage.getItem('demoVotes') || '[]');
+            const hasAlreadyVoted = existingVotes.some(vote => vote.idNumber === userData.idNumber);
+            
+            if (hasAlreadyVoted) {
+                alert('This ID number has already voted. Each person can only vote once.');
+                return;
+            }
+            
+            // Move to role selection page
+            showPage('role');
+        });
+
+        // Event Listeners for Role Selection Page
+        const voterOption = document.getElementById('voter-option');
+        const candidateOption = document.getElementById('candidate-option');
+        const selectedRoleInput = document.getElementById('selected-role');
+        
+        voterOption.addEventListener('click', function() {
+            voterOption.classList.add('selected');
+            candidateOption.classList.remove('selected');
+            selectedRoleInput.value = 'voter';
+            userData.role = 'voter';
+        });
+        
+        candidateOption.addEventListener('click', function() {
+            candidateOption.classList.add('selected');
+            voterOption.classList.remove('selected');
+            selectedRoleInput.value = 'candidate';
+            userData.role = 'candidate';
+        });
+        
+        // Continue button on role page
+        document.getElementById('role-continue').addEventListener('click', function() {
+            if (!selectedRoleInput.value) {
+                alert('Please select a role to continue');
+                return;
+            }
+            
+            // If user is a candidate, show a message and don't proceed to voting
+            if (userData.role === 'candidate') {
+                alert('Candidates cannot vote in this election. Please select "Voter" to continue.');
+                return;
+            }
+            
+            // Move to ward selection page
+            showPage('ward');
+        });
+        
+        // Back button on role page
+        document.getElementById('back-to-signin').addEventListener('click', function() {
+            showPage('signin');
+        });
+
+        // Event Listeners for Ward Selection Page
+        document.getElementById('ward-continue').addEventListener('click', function() {
+            const wardSelect = document.getElementById('ward-select');
+            userData.ward = wardSelect.value;
+            
+            if (!userData.ward) {
+                alert('Please select a ward to continue');
+                return;
+            }
+            
+            // Move to voting page
+            showPage('voting');
+        });
+        
+        // Back button on ward page
+        document.getElementById('back-to-role').addEventListener('click', function() {
+            showPage('role');
+        });
+
+        // Event Listeners for Voting Page
+        document.getElementById('voting-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect votes from the form
+            collectVotes();
+            
+            // Check if at least one vote has been cast
+            const hasVotes = Object.values(userData.votes).some(vote => vote !== 'Not selected');
+            
+            if (!hasVotes) {
+                alert('Please vote for at least one position before submitting');
+                return;
+            }
+            
+            // Update confirmation page with the votes
+            updateConfirmationPage();
+            
+            // Move to confirmation page
+            showPage('confirmation');
+        });
+        
+        // Back button on voting page
+        document.getElementById('back-to-ward').addEventListener('click', function() {
+            showPage('ward');
+        });
+
+        // Event Listeners for Confirmation Page
+        document.getElementById('confirm-vote').addEventListener('click', function() {
+            // Store the vote in localStorage
+            const voteRecord = {
+                voter: userData.name,
+                idNumber: userData.idNumber,
+                ward: userData.ward,
+                votes: userData.votes,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Get existing votes from localStorage or create empty array
+            const existingVotes = JSON.parse(localStorage.getItem('demoVotes') || '[]');
+            existingVotes.push(voteRecord);
+            localStorage.setItem('demoVotes', JSON.stringify(existingVotes));
+            
+            // Update vote counts
+            updateVoteCounts(userData.votes);
+            
+            // Move to thank you page
+            showPage('thankyou');
+        });
+        
+        // Back button on confirmation page
+        document.getElementById('back-to-voting').addEventListener('click', function() {
+            showPage('voting');
+        });
+
+        // Event Listeners for Thank You Page
+        document.getElementById('start-new-session').addEventListener('click', function() {
+            // Reset form data
+            userData.name = '';
+            userData.idNumber = '';
+            userData.role = '';
+            userData.ward = '';
+            userData.votes = {};
+            
+            // Reset forms
+            document.getElementById('signin-form').reset();
+            document.getElementById('voting-form').reset();
+            document.getElementById('ward-select').value = '';
+            
+            // Remove selected role
+            voterOption.classList.remove('selected');
+            candidateOption.classList.remove('selected');
+            selectedRoleInput.value = '';
+            
+            // Go back to sign in page
+            showPage('signin');
+        });
+
+        // View results from thank you page
+        document.getElementById('view-results').addEventListener('click', function() {
+            showPage('results');
+        });
+
+        // View results from sign in page
+        document.getElementById('view-results-from-signin').addEventListener('click', function() {
+            showPage('results');
+        });
+
+        // Back from results page
+        document.getElementById('back-from-results').addEventListener('click', function() {
+            showPage('thankyou');
+        });
+
+        // Reset all votes button
+        document.getElementById('reset-results').addEventListener('click', resetAllVotes);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize vote counts in localStorage
+            initializeVoteCounts();
+            
+            // Show the sign in page by default
+            showPage('signin');
+            
+            // Select voter by default for better user experience
+            voterOption.click();
+        });
+    </script>
+</body>
+</html>
+10
